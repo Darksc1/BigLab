@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@using BigLab.Entities
+@model IndexModel
+
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Компьютерные игры</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
+                    </li>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Авторизация</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Профиль</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+@if (User.Identity.IsAuthenticated && Model.User.isAdmin)
+{
+    <form method="post">
+        <input placeholder="Название игры" type="text" name="gameName"/>
+        <input placeholder="Жанр игры" type="text" name="gameGenre"/>
+        <input placeholder="Описание игры" type="text" name="gameDescription"/>
+        <input placeholder="Цена игры" type="text" name="gamePrice"/>
+        <input type="submit" name="buttonType" value="Добавить"/>
+    </form>
+    
+    <pre>
+    </pre>
+    <form method="post">
+        <input placeholder="ID удаляемой игры" type="text" name="deleteGameID"/>
+        <input type="submit" name="buttonType" value="Удалить"/>
+    </form>
+    
+}
+<div style="width:200%; height:1000px; overflow-y:scroll;">
+    <pre>
+    </pre>
+
+    <table class="table table-responsive table-hover" style="align-content: normal">  
+        <tr>  
+            <th>ID</th>  
+            <th>Название</th>  
+            <th>Жанр</th>  
+            <th>Описание</th>  
+            <th>Цена</th>
+        </tr>  
+        @foreach (Game el in Model.Games)  
+        {  
+            <tr>  
+                <td>@el.Id</td>  
+                <td>@el.Name</td>  
+                <td>@el.Genre</td>  
+                <td>@el.Description</td>  
+                <td>@el.Price</td>
+                @if (!Model.User.isAdmin)
+                {
+                    <td>
+                        <form method="post">
+                            <input type="submit" name="buttonType" value="Купить @el.Id"/>
+                        </form>
+                    </td>
+                }
+            </tr>  
+        }  
+    </table>
+</div>

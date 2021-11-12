@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "User Page";
+}
+
+@using BigLab.Entities
+@using Microsoft.EntityFrameworkCore
+@model UserPageModel
+
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Компьютерные игры</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="UserPage">Профиль</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="text-left">
+    <a href="/Home/Logout">
+        <div style="color:green; font-size: xxx-large">
+            @User.Identity.Name
+        </div> Выйти
+    </a>
+</div>
+
+
+@if (User.Identity.IsAuthenticated && Model.User.isAdmin)
+{
+    <form method="post">
+        <input style="width: 300px" placeholder="ID пользователя для установки прав" type="number" name="userID"/>
+        <input style="width: 300px" placeholder="Статус прав админа: true/false" type="text" name="userIsAdmin"/>
+        <input type="submit" name="buttonType" value="Установить"/>
+    </form>
+    <pre>
+    </pre>
+
+    <div style="width:200%; height:600px; overflow-y:scroll;">
+        <pre>
+    </pre>
+
+        <table class="table table-responsive table-hover" style="align-content: normal">
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Права администратора</th>
+            </tr>
+            @foreach (UserInfo el in Model.Users)
+            {
+                <tr>
+                    <td>@el.Id</td>
+                    <td>@el.Username</td>
+                    <td>@el.isAdmin</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+else if (User.Identity.IsAuthenticated && !Model.User.isAdmin)
+{
+    @if (Model.Orders.Count > 0)
+    {
+        <h1>Ваши заказы</h1>
+        <div style="width:200%; height:600px; overflow-y:scroll;">
+            <pre>
+    </pre>
+
+            <table class="table table-responsive table-hover" style="align-content: normal">
+                <tr>
+                    <th>ID</th>
+                    <th>Игра</th>
+                    <th>Описание</th>
+                    <th>Цена</th>
+                </tr>
+                @foreach (Order el in Model.Orders)
+                {
+                    <tr>
+                        <td>@el.Id</td>
+                        <td>@el.UserGame.Name</td>
+                        <td>@el.UserGame.Description</td>
+                        <td>@el.UserGame.Price</td>
+                        <td>
+                            <form method="post">
+                                <input type="submit" name="buttonType" value="Убрать @el.Id"/>
+                            </form> 
+                        </td>
+                    </tr>
+                }
+                @if (Model.Orders.Sum(n => n.UserGame.Price) != null)
+                {
+                    <tr>
+                        <th>Сумма заказа: @Model.Orders.Sum(n => n.UserGame.Price)</th>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+    else
+    {
+        <h1>Вы еще не совершали заказы</h1>
+    }
+}
